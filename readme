@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#
+# readme
+# 
+# Open README without changing directories.
+#
+
+PWD=`pwd`
+VIEWER="vi"
+if [ ! -z $EDITOR ]; then
+  VIEWER=$EDITOR
+elif [ ! -z $GIT_EDITOR ]; then
+  VIEWER=$GIT_EDITOR
+elif command -v git >/dev/null 2>&1; then
+  if [ ! -z $(git config core.editor) ]; then
+    VIEWER=$(git config core.editor)
+  fi
+fi
+
+while [[ $(pwd) != '/' ]]; do
+  READMES=$(find . -maxdepth 1 -iname 'readme*' -type f | grep '.*')
+  if [ $? -eq 0 ]; then
+    eval "$VIEWER $(echo "$READMES" | tail -n 1)"
+    cd "$PWD"
+    exit 0
+  fi
+  cd ..
+done
+
+cd "$PWD"
+exit 1
+
+
